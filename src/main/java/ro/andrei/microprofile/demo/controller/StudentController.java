@@ -1,6 +1,8 @@
 package ro.andrei.microprofile.demo.controller;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -13,9 +15,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.faulttolerance.Asynchronous;
 import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
 import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.faulttolerance.Timeout;
+import org.eclipse.microprofile.metrics.Counter;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Metric;
 import ro.andrei.microprofile.demo.dto.Student;
 import ro.andrei.microprofile.demo.service.StudentService;
 
@@ -23,6 +30,10 @@ import ro.andrei.microprofile.demo.service.StudentService;
 @Path("/student")
 @ApplicationScoped
 public class StudentController {
+
+    @Inject
+    @Metric(name = "retryCount")
+    private Counter retryCount;
 
     @Inject
     private StudentService studentService;
@@ -38,6 +49,26 @@ public class StudentController {
     @Produces(MediaType.APPLICATION_JSON)
     public Student getById(@PathParam("id") Integer id) {
         return studentService.getById(id);
+    }
+
+    @GET
+    @Path("/{id}/retry")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Retry(maxRetries = 5)
+    public Student getByIdWithRetry(@PathParam("id") Integer id) {
+        retryCount.inc();
+        if(retryCount.getCount() % 3 != 0) {
+            throw new RuntimeException();
+        }
+        return studentService.getById(id);
+    }
+
+    @GET
+    @Path("/{id}/async")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Asynchronous
+    public CompletionStage<Student> getByIdAsync(@PathParam("id") Integer id) {
+        return CompletableFuture.completedFuture(studentService.getById(id));
     }
 
     @GET
