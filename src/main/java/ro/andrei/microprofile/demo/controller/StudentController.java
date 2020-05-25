@@ -16,12 +16,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.faulttolerance.Asynchronous;
+import org.eclipse.microprofile.faulttolerance.Bulkhead;
 import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
 import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.eclipse.microprofile.metrics.Counter;
-import org.eclipse.microprofile.metrics.annotation.Counted;
 import org.eclipse.microprofile.metrics.annotation.Metric;
 import ro.andrei.microprofile.demo.dto.Student;
 import ro.andrei.microprofile.demo.service.StudentService;
@@ -47,6 +47,7 @@ public class StudentController {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+//    @Bulkhead(5)
     public Student getById(@PathParam("id") Integer id) {
         return studentService.getById(id);
     }
