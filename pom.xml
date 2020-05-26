@@ -71,6 +71,8 @@
                             <serverName>${final.name}</serverName>
                             <serverStartTimeout>60</serverStartTimeout>
                             <bootstrapProperties>
+                                <JAEGER_SAMPLER_TYPE>const</JAEGER_SAMPLER_TYPE>
+                                <JAEGER_SAMPLER_PARAM>1</JAEGER_SAMPLER_PARAM>
                                 <project.name>${final.name}</project.name>
                                 <jwt.issuer>https://microprofile.andrei.ro</jwt.issuer>
                             </bootstrapProperties>
@@ -82,7 +84,7 @@
                 <dependency>
                     <groupId>io.jaegertracing</groupId>
                     <artifactId>jaeger-client</artifactId>
-                    <version>0.34.0</version>
+                    <version>0.34.3</version>
                 </dependency>
             </dependencies>
         </profile>

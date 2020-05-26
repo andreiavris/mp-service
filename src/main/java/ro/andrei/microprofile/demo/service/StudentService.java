@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import javax.ws.rs.NotFoundException;
+import org.eclipse.microprofile.opentracing.Traced;
 import ro.andrei.microprofile.demo.dto.Address;
 import ro.andrei.microprofile.demo.dto.Student;
 
@@ -27,6 +28,7 @@ public class StudentService {
         return new ArrayList<>(DB.values());
     }
 
+    @Traced
     public Student getById(Integer id) {
         if(!DB.containsKey(id)) {
             throw new NotFoundException();
